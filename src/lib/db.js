@@ -16,10 +16,8 @@ const getDBHandle = async () => {
 }
 
 const initializeDB = async () => {
-
     try {
         const dbHandler = await getDBHandle()
-
         await dbHandler.exec(`
             CREATE TABLE IF NOT EXISTS todo (
                 id uuid PRIMARY KEY,
@@ -31,13 +29,11 @@ const initializeDB = async () => {
                 state boolean default false
             );
         `)
-
         await dbHandler.close()
     }
     catch (err) {
         console.error(`there was an error opening the database: ${err.message}`)
     }
-
 }
 
 module.exports = {

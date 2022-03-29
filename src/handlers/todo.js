@@ -9,7 +9,6 @@ ResquestHandler.post('/to-dos', async (req, res) => {
         const dbHandler = await getDBHandle();
         const { title, description, priority } = req.body
         const id = uuidv4();
-        console.log(title, description, priority);
         const creationInfo = await dbHandler.run(`
             INSERT INTO todo (id, title, description, priority)
             VALUES (?, ?, ?, ?)
@@ -18,8 +17,6 @@ ResquestHandler.post('/to-dos', async (req, res) => {
         const todos = await dbHandler.all(`
         SELECT * FROM todo
         `);
-
-        console.log(todos);
 
         await dbHandler.close()
         res.status(200).json({
@@ -93,7 +90,6 @@ ResquestHandler.get('/to-dos/priority/:priority', async (req, res) => {
 // get by date
 ResquestHandler.get('/to-dos/date/:dateCreated', async (req, res) => {
     try {
-
         const dbHandler = await getDBHandle()
         const { dateCreated } = req.params;
         const todos = await dbHandler.all(`
@@ -106,12 +102,10 @@ ResquestHandler.get('/to-dos/date/:dateCreated', async (req, res) => {
             message: "Todos retrieved successfully",
             todos
         })
-
         if (!todos)
             res.status(404).json({
                 message: "No todos found"
             })
-
     } catch (err) {
         res.status(500).json({
             message: err.message
@@ -123,11 +117,7 @@ ResquestHandler.get('/to-dos/date/:dateCreated', async (req, res) => {
 ResquestHandler.delete('/to-dos/:id', async (req, res) => {
     try {
         const dbHandler = await getDBHandle()
-
         const { id } = req.params
-
-        console.log(id)
-
         const todoDeleted = await dbHandler.run(`
             DELETE FROM todo
             WHERE id = ?
@@ -155,13 +145,11 @@ ResquestHandler.delete('/to-dos/:id', async (req, res) => {
 ResquestHandler.patch('/to-dos/:id', async (req, res) => {
     try {
         const dbHandler = await getDBHandle()
-
         const { id } = req.params
         const { title, description, state, priority } = req.body
-        console.log(id, title, description, state, priority);
         const todoUpdated = await dbHandler.run(`
             UPDATE todo
-            SET title = ?, description = ?, state = ?, priority = ?
+            SET title = ?, description = ?, state = ?, priority = ?, dateUpdated = CURRENT_DATE
             WHERE id = ?
         `, [title, description, state, priority, id])
 
@@ -187,9 +175,7 @@ ResquestHandler.patch('/to-dos/:id', async (req, res) => {
 ResquestHandler.get('/to-dos/:id', async (req, res) => {
     try {
         const dbHandler = await getDBHandle()
-
         const { id } = req.params
-
         const todo = await dbHandler.get(`
             SELECT * FROM todo
             WHERE id = ?
